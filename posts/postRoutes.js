@@ -88,10 +88,11 @@ router.post("/", (req, res) => {
 router.post("/:id/comments", (req, res) => {
   const { id: post_id } = req.params;
   const { body: comment } = req;
+  const { text } = req.body;
   db.findById(post_id)
     .then((data) => {
       if (data.length !== 0) {
-        if (!comment.text) {
+        if (!text) {
           res
             .status(400)
             .json({ errorMessage: "Please provide text for the comment." });
@@ -116,7 +117,10 @@ router.post("/:id/comments", (req, res) => {
       }
     })
     .catch((data) => {
-      res.status(500).json(data);
+      res.status(500).json({
+                error:
+                  "There was an error while saving the comment to the database",
+              });
     });
 });
 
@@ -140,11 +144,9 @@ router.put("/:id", (req, res) => {
                     res.status(200).json(post);
                   })
                   .catch(() => {
-                    res
-                      .status(500)
-                      .json({
-                        error: "The post information could not be modified.",
-                      });
+                    res.status(500).json({
+                      error: "The post information could not be modified.",
+                    });
                   });
               } else {
                 res.status(404).json({
